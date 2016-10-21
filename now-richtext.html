@@ -25,12 +25,25 @@ Element to handle Notes RichText delivered via DDS
 	Polymer({
 		is: 'now-richtext',
 		properties: {
+			/**
+			 * The property to had to the marked-element. This is the decoded rich text
+			 * @type {String}
+			 */
 			htmlContent: String,
+			/**
+			 * The multipart MIME object for the rich text field
+			 * @type {Object}
+			 */
 			richTextObj: {
 				type: Object,
 				observer: '_onRichText'
 			}
 		},
+		/**
+		 * Observer fired when the richTextObj changes. Decode the rich text html content
+		 * @param  {Object} newVal new value
+		 * @param  {Object} oldVal Old value
+		 */
 		_onRichText: function(newVal, oldVal) {
 			if (newVal) {
 				var textObj = newVal.content;
@@ -56,6 +69,11 @@ Element to handle Notes RichText delivered via DDS
 				}.bind(this), 200);
 			}
 		},
+		/**
+		 * Ensure images are displayed. Find all images and update the img tag src attribute
+		 * or replace the text node for an attachment with an img
+		 * @param  {Array} mimeObjContent The array of mime parts
+		 */
 		_updateImages: function(mimeObjContent) {
 			for (var j = 0; j < mimeObjContent.length; j++) {
 				var mimeObj = mimeObjContent[j];
