@@ -1,0 +1,35 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+
+<link rel="import" href="../now-richtext.html">
+<!--
+
+@element doc-wrapper
+@demo demo/index.html
+-->
+<dom-module id="doc-wrapper">
+	<template>
+		<style>
+			:host {
+				display: block;
+				box-sizing: border-box;
+			}
+		</style>
+		<iron-ajax
+			url="doc.json"
+			handle-as="json"
+			last-response="{{doc}}"
+			auto>
+		</iron-ajax>
+		<now-richtext rich-text-obj="{{doc.BulletinText}}"></now-richtext>
+	</template>
+	<script>
+Polymer({
+	is: 'doc-wrapper',
+	properties: {
+		doc: Object
+	}
+});
+	</script>
+</dom-module>
