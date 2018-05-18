@@ -1,6 +1,7 @@
 {
   "name": "now-richtext",
   "description": "Element to handle Notes RichText delivered via DDS",
+  "version": "1.0.0",
   "main": "now-richtext.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
@@ -12,6 +13,7 @@
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
     "web-component-tester": "^4.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
-    "paper-material": "PolymerElements/paper-material#^1.0.6"
+    "paper-material": "PolymerElements/paper-material#^1.0.6",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.0.0"
   }
 }

@@ -26,7 +26,7 @@ Element to handle Notes RichText delivered via DDS
 		is: 'now-richtext',
 		properties: {
 			/**
-			 * The property to had to the marked-element. This is the decoded rich text
+			 * The property to add to the marked-element. This is the decoded rich text
 			 * @type {String}
 			 */
 			htmlContent: String,
@@ -83,6 +83,7 @@ Element to handle Notes RichText delivered via DDS
 					var elem = null;
 					var srcAttrStr = null;
 					if (isInline) {
+						// console.log(this.is, '_updateImages, inline', contentDispo);
 						var imageBase64 = mimeObj.data;
 						var imgElemName = 'cid:' + mimeObj.contentID.substring(1, mimeObj.contentID.length - 1);
 						var contentType = mimeObj.contentType.split(';')[0];
@@ -92,6 +93,7 @@ Element to handle Notes RichText delivered via DDS
 							elem.setAttribute('src', srcAttrStr);
 						}
 					}else { // Gotta create an img tag for attachments
+						// console.log(this.is, '_updateImages, NOT inline', contentDispo);
 						var elemArr = this.querySelectorAll('i');
 						for (var k = 0; k < elemArr.length; k++) {
 							elem = elemArr[k];

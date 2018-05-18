@@ -8,7 +8,8 @@
 
 		<link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
 		<link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
-		<link rel="import" href="doc-wrapper.html">
+		<link rel="import" href="../../iron-ajax/iron-ajax.html">
+		<link rel="import" href="../now-richtext.html">
 
 		<style is="custom-style" include="demo-pages-shared-styles">
 		</style>
@@ -17,8 +18,14 @@
 		<div class="vertical-section-container centered">
 			<h3>Basic now-richtext Demo</h3>
 			<demo-snippet>
-				<template>
-					<doc-wrapper></doc-wrapper>
+				<template id="nowRichtext" is="dom-bind">
+					<iron-ajax
+						url="doc.json"
+						handle-as="json"
+						last-response="{{doc}}"
+						auto>
+					</iron-ajax>
+					<now-richtext rich-text-obj="{{doc.BulletinText}}"></now-richtext>
 				</template>
 			</demo-snippet>
 		</div>
