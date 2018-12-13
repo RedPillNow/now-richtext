@@ -6,27 +6,27 @@
 		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 		<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
-		<link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-		<link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
 		<link rel="import" href="../../iron-ajax/iron-ajax.html">
+		<link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+		<link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+		<link rel="import" href="../../polymer/lib/elements/dom-bind.html">
 		<link rel="import" href="../now-richtext.html">
-
-		<style is="custom-style" include="demo-pages-shared-styles">
-		</style>
 	</head>
-	<body>
+	<body unresolved>
 		<div class="vertical-section-container centered">
 			<h3>Basic now-richtext Demo</h3>
-			<demo-snippet>
-				<template id="nowRichtext" is="dom-bind">
-					<iron-ajax
-						url="doc.json"
-						handle-as="json"
-						last-response="{{doc}}"
-						auto>
-					</iron-ajax>
-					<now-richtext rich-text-obj="{{doc.BulletinText}}"></now-richtext>
-				</template>
+			<demo-snippet class="centered-demo">
+				<dom-bind>
+					<template>
+						<iron-ajax
+							url="doc.json"
+							handle-as="json"
+							last-response="{{doc}}"
+							auto>
+						</iron-ajax>
+						<now-richtext rich-text-obj="{{doc.BulletinText}}"></now-richtext>
+					</template>
+				</dom-bind>
 			</demo-snippet>
 		</div>
 	</body>

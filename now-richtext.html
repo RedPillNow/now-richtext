@@ -1,5 +1,4 @@
-<link rel="import" href="../polymer/polymer.html">
-
+<link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../marked-element/marked-element.html">
 <link rel="import" href="quoted-printable.html">
 
@@ -7,6 +6,7 @@
 `now-richtext`
 Element to handle Notes RichText delivered via DDS
 
+@element now-richtext
 @demo demo/index.html
 -->
 
@@ -15,21 +15,28 @@ Element to handle Notes RichText delivered via DDS
 		<style>
 			:host {
 				display: block;
+				box-sizing: border-box;
 			}
 		</style>
-		<marked-element markdown="{{htmlContent}}">
+		<marked-element id="marked" markdown="{{htmlContent}}">
 			<div class="markdown-html"></div>
 		</marked-element>
 	</template>
 	<script>
-	Polymer({
-		is: 'now-richtext',
-		properties: {
+class NowRichtext extends Polymer.Element {
+	static get is() {
+		return 'now-richtext';
+	}
+	get is() {
+		return NowRichtext.is;
+	}
+	static get properties() {
+		return {
 			/**
 			 * The property to add to the marked-element. This is the decoded rich text
 			 * @type {String}
 			 */
-			htmlContent: String,
+			 htmlContent: String,
 			/**
 			 * The multipart MIME object for the rich text field
 			 * @type {Object}
@@ -38,80 +45,86 @@ Element to handle Notes RichText delivered via DDS
 				type: Object,
 				observer: '_onRichText'
 			}
-		},
-		/**
-		 * Observer fired when the richTextObj changes. Decode the rich text html content
-		 * @param  {Object} newVal new value
-		 * @param  {Object} oldVal Old value
-		 */
-		_onRichText: function(newVal, oldVal) {
-			if (newVal) {
-				var textObj = newVal.content;
-				for (var i = 0; i < textObj.length; i++) {
-					var mimeObj = textObj[i];
-					if (mimeObj.contentType.indexOf('text/html') > -1) {
-						var html = mimeObj.data;
-						if (mimeObj.contentTransferEncoding === 'base64') {
-							html = atob(mimeObj.data);
-						}else if (mimeObj.contentTransferEncoding === 'quoted-printable') {
-							html = quotedPrintable.decode(mimeObj.data);
-						}
-						var removeText = ['<html>','</html>','<body>','</body>','<head>','</head>'];
-						for (var j = 0; j < removeText.length; j++) {
-							html = html.replace(removeText[j],'');
-						}
-						this.set('htmlContent', html);
+		};
+	}
+	constructor() {
+		super();
+	}
+	/**
+	 * Observer fired when the richTextObj changes. Decode the rich text html content
+	 * @param  {Object} newVal new value
+	 * @param  {Object} oldVal Old value
+	 */
+	_onRichText(newVal, oldVal) {
+		if (newVal) {
+			var textObj = newVal.content;
+			for (var i = 0; i < textObj.length; i++) {
+				var mimeObj = textObj[i];
+				if (mimeObj.contentType.indexOf('text/html') > -1) {
+					var html = mimeObj.data;
+					if (mimeObj.contentTransferEncoding === 'base64') {
+						html = atob(mimeObj.data);
+					}else if (mimeObj.contentTransferEncoding === 'quoted-printable') {
+						html = quotedPrintable.decode(mimeObj.data);
 					}
+					var removeText = ['<html>','</html>','<body>','</body>','<head>','</head>'];
+					for (var j = 0; j < removeText.length; j++) {
+						html = html.replace(removeText[j],'');
+					}
+					this.set('htmlContent', html);
 				}
-				// Gotta wait for the DOM to be built
-				this.async(function() {
-					this._updateImages(textObj);
-				}.bind(this), 200);
 			}
-		},
-		/**
-		 * Ensure images are displayed. Find all images and update the img tag src attribute
-		 * or replace the text node for an attachment with an img
-		 * @param  {Array} mimeObjContent The array of mime parts
-		 */
-		_updateImages: function(mimeObjContent) {
-			for (var j = 0; j < mimeObjContent.length; j++) {
-				var mimeObj = mimeObjContent[j];
-				if (mimeObj.contentType.indexOf('image/') > -1) {
-					var contentDispo = mimeObj.contentDisposition;
-					var isInline = contentDispo.indexOf('inline') > -1;
-					var elem = null;
-					var srcAttrStr = null;
-					if (isInline) {
-						// console.log(this.is, '_updateImages, inline', contentDispo);
-						var imageBase64 = mimeObj.data;
-						var imgElemName = 'cid:' + mimeObj.contentID.substring(1, mimeObj.contentID.length - 1);
-						var contentType = mimeObj.contentType.split(';')[0];
-						elem = this.querySelector('[src="' + imgElemName + '"]');
-						if (elem) {
-							srcAttrStr = 'data:' + contentType + ';base64,' + imageBase64;
-							elem.setAttribute('src', srcAttrStr);
-						}
-					}else { // Gotta create an img tag for attachments
-						// console.log(this.is, '_updateImages, NOT inline', contentDispo);
-						var elemArr = this.querySelectorAll('i');
-						for (var k = 0; k < elemArr.length; k++) {
-							elem = elemArr[k];
-							var dispoArr = mimeObj.contentDisposition.split(';');
-							var fileNamePart = dispoArr[1].substring(dispoArr[1].indexOf('="') + 2, dispoArr[1].lastIndexOf('"'));
-							if (elem.innerHTML.indexOf(fileNamePart) > -1) {
-								var parent = elem.parentNode;
-								var img = document.createElement('img');
-								var contentTypeArr = mimeObj.contentType.split(';');
-								srcAttrStr = 'data:' + contentTypeArr[0] + ';base64,' + mimeObj.data;
-								img.setAttribute('src', srcAttrStr);
-								parent.replaceChild(img, elem);
-							}
+			// Gotta wait for the DOM to be built
+			setTimeout(function() {
+				this._updateImages(textObj);
+			}.bind(this), 200);
+		}
+	}
+	/**
+	 * Ensure images are displayed. Find all images and update the img tag src attribute
+	 * or replace the text node for an attachment with an img
+	 * @param  {Array} mimeObjContent The array of mime parts
+	 */
+	_updateImages(mimeObjContent) {
+		for (let j = 0; j < mimeObjContent.length; j++) {
+			const mimeObj = mimeObjContent[j];
+			if (mimeObj.contentType.startsWith('image/')) {
+				const contentDispo = mimeObj.contentDisposition;
+				const isInline = contentDispo.startsWith('inline');
+				const markedContent = this.$.marked.$.content;
+				let elem = null;
+				let srcAttrStr = null;
+				if (isInline) {
+					// console.log(this.is, '_updateImages, inline', contentDispo);
+					const imageBase64 = mimeObj.data;
+					const imgElemName = 'cid:' + mimeObj.contentID.substring(1, mimeObj.contentID.length - 1);
+					const contentType = mimeObj.contentType.split(';')[0];
+					elem = markedContent.querySelector('[src="' + imgElemName + '"]');
+					if (elem) {
+						srcAttrStr = 'data:' + contentType + ';base64,' + imageBase64;
+						elem.setAttribute('src', srcAttrStr);
+					}
+				}else { // Gotta create an img tag for attachments
+					// console.log(this.is, '_updateImages, NOT inline', contentDispo);
+					const elemArr = markedContent.querySelectorAll('i');
+					for (let k = 0; k < elemArr.length; k++) {
+						elem = elemArr[k];
+						const dispoArr = mimeObj.contentDisposition.split(';');
+						const fileNamePart = dispoArr[1].substring(dispoArr[1].indexOf('="') + 2, dispoArr[1].lastIndexOf('"'));
+						if (elem.innerHTML.indexOf(fileNamePart) > -1) {
+							const parent = elem.parentNode;
+							const img = document.createElement('img');
+							const contentTypeArr = mimeObj.contentType.split(';');
+							srcAttrStr = 'data:' + contentTypeArr[0] + ';base64,' + mimeObj.data;
+							img.setAttribute('src', srcAttrStr);
+							parent.replaceChild(img, elem);
 						}
 					}
 				}
 			}
 		}
-	});
+	}
+}
+customElements.define(NowRichtext.is, NowRichtext);
 	</script>
 </dom-module>
