@@ -57,18 +57,18 @@ class NowRichtext extends Polymer.Element {
 	 */
 	_onRichText(newVal, oldVal) {
 		if (newVal) {
-			var textObj = newVal.content;
-			for (var i = 0; i < textObj.length; i++) {
-				var mimeObj = textObj[i];
+			const textObj = newVal.content;
+			for (let i = 0; i < textObj.length; i++) {
+				const mimeObj = textObj[i];
 				if (mimeObj.contentType.indexOf('text/html') > -1) {
-					var html = mimeObj.data;
+					let html = mimeObj.data;
 					if (mimeObj.contentTransferEncoding === 'base64') {
 						html = atob(mimeObj.data);
 					}else if (mimeObj.contentTransferEncoding === 'quoted-printable') {
 						html = quotedPrintable.decode(mimeObj.data);
 					}
-					var removeText = ['<html>','</html>','<body>','</body>','<head>','</head>'];
-					for (var j = 0; j < removeText.length; j++) {
+					const removeText = ['<html>','</html>','<body>','</body>','<head>','</head>'];
+					for (let j = 0; j < removeText.length; j++) {
 						html = html.replace(removeText[j],'');
 					}
 					this.set('htmlContent', html);
