@@ -11,6 +11,14 @@
 		<link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
 		<link rel="import" href="../../polymer/lib/elements/dom-bind.html">
 		<link rel="import" href="../now-richtext.html">
+		<style is="custom-stye" include="demo-pages-shared-styles">
+			now-richtext {
+				--now-richtext-markdown-html: {
+					font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+					font-size: 100%;
+				};
+			}
+		</style>
 	</head>
 	<body unresolved>
 		<div class="vertical-section-container centered">
@@ -25,6 +33,22 @@
 							auto>
 						</iron-ajax>
 						<now-richtext rich-text-obj="{{doc.BulletinText}}"></now-richtext>
+					</template>
+				</dom-bind>
+			</demo-snippet>
+		</div>
+		<div class="vertical-section-container centered">
+			<h3>now-richtext Demo - Clean HTML</h3>
+			<demo-snippet class="centered-demo">
+				<dom-bind>
+					<template>
+						<iron-ajax
+							url="doc.json"
+							handle-as="json"
+							last-response="{{doc}}"
+							auto>
+						</iron-ajax>
+						<now-richtext rich-text-obj="{{doc.BulletinText}}" clean-html></now-richtext>
 					</template>
 				</dom-bind>
 			</demo-snippet>

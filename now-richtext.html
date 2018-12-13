@@ -17,9 +17,12 @@ Element to handle Notes RichText delivered via DDS
 				display: block;
 				box-sizing: border-box;
 			}
+			#markdownHtml {
+				@apply --now-richtext-markdown-html
+			}
 		</style>
 		<marked-element id="marked" markdown="{{htmlContent}}">
-			<div class="markdown-html"></div>
+			<div id="markdownHtml" slot="markdown-html"></div>
 		</marked-element>
 	</template>
 	<script>
@@ -44,6 +47,15 @@ class NowRichtext extends Polymer.Element {
 			richTextObj: {
 				type: Object,
 				observer: '_onRichText'
+			},
+			/**
+			 * True to remove html, head and body tags. Will also remove all attributes
+			 * from font tags
+			 * @type {Boolean}
+			 */
+			cleanHtml: {
+				type: Boolean,
+				value: false
 			}
 		};
 	}
@@ -67,10 +79,7 @@ class NowRichtext extends Polymer.Element {
 					}else if (mimeObj.contentTransferEncoding === 'quoted-printable') {
 						html = quotedPrintable.decode(mimeObj.data);
 					}
-					const removeText = ['<html>','</html>','<body>','</body>','<head>','</head>'];
-					for (let j = 0; j < removeText.length; j++) {
-						html = html.replace(removeText[j],'');
-					}
+					html = this.cleanHtml ? this._cleanupHtml(html) : html;
 					this.set('htmlContent', html);
 				}
 			}
@@ -91,7 +100,7 @@ class NowRichtext extends Polymer.Element {
 			if (mimeObj.contentType.startsWith('image/')) {
 				const contentDispo = mimeObj.contentDisposition;
 				const isInline = contentDispo.startsWith('inline');
-				const markedContent = this.$.marked.$.content;
+				const markedContent = this.$.markdownHtml;
 				let elem = null;
 				let srcAttrStr = null;
 				if (isInline) {
@@ -123,6 +132,35 @@ class NowRichtext extends Polymer.Element {
 				}
 			}
 		}
+	}
+	/**
+	 * Remove any html, head and body tags. Remove all attributes
+	 * from font tags
+	 * @param {string} html
+	 * @returns {string}
+	 */
+	_cleanupHtml(html) {
+		if (html) {
+			const htmlElem = document.createElement('html');
+			htmlElem.innerHTML = html;
+			const head = htmlElem.querySelector('head');
+			head.remove();
+			const body = htmlElem.querySelector('body');
+			const fonts = body.querySelectorAll('font');
+			for (let i = 0; i < fonts.length; i++) {
+				const font = fonts[i];
+				font.removeAttribute('face');
+				font.removeAttribute('color');
+				font.removeAttribute('size');
+			}
+			return body.innerHTML;
+
+			// const removeText = ['<html>','</html>','<body>','</body>','<head>','</head>'];
+			// for (let j = 0; j < removeText.length; j++) {
+			// 	html = html.replace(removeText[j],'');
+			// }
+		}
+		return null;
 	}
 }
 customElements.define(NowRichtext.is, NowRichtext);
