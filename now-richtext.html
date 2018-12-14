@@ -108,10 +108,22 @@ class NowRichtext extends Polymer.Element {
 					const imageBase64 = mimeObj.data;
 					const imgElemName = 'cid:' + mimeObj.contentID.substring(1, mimeObj.contentID.length - 1);
 					const contentType = mimeObj.contentType.split(';')[0];
-					elem = markedContent.querySelector('[src="' + imgElemName + '"]');
-					if (elem) {
-						srcAttrStr = 'data:' + contentType + ';base64,' + imageBase64;
-						elem.setAttribute('src', srcAttrStr);
+					const elems = markedContent.querySelectorAll('[src="' + imgElemName + '"]');
+					if (elems && elems.length > 1) {
+						for (let l = 0; l < elems.length; l++) {
+							const el = elems[l];
+							if (el) {
+								srcAttrStr = 'data:' + contentType + ';base64,' + imageBase64;
+								el.setAttribute('src', srcAttrStr);
+							}
+						}
+					}else if (elems && elems.length === 1) {
+						// elem = markedContent.querySelector('[src="' + imgElemName + '"]');
+						elem = elems[0];
+						if (elem) {
+							srcAttrStr = 'data:' + contentType + ';base64,' + imageBase64;
+							elem.setAttribute('src', srcAttrStr);
+						}
 					}
 				}else { // Gotta create an img tag for attachments
 					// console.log(this.is, '_updateImages, NOT inline', contentDispo);
@@ -152,6 +164,12 @@ class NowRichtext extends Polymer.Element {
 				font.removeAttribute('face');
 				font.removeAttribute('color');
 				font.removeAttribute('size');
+			}
+			const notesLinks = body.querySelectorAll('a[href^="Notes://"]');
+			for (let i = 0; i < notesLinks.length; i++) {
+				const link = notesLinks[i];
+				const linkArr = link.href.split('/');
+
 			}
 			return body.innerHTML;
 
