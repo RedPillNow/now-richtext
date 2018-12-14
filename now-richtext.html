@@ -165,13 +165,6 @@ class NowRichtext extends Polymer.Element {
 				font.removeAttribute('color');
 				font.removeAttribute('size');
 			}
-			const notesLinks = body.querySelectorAll('a[href^="Notes://"]');
-			for (let i = 0; i < notesLinks.length; i++) {
-				const link = notesLinks[i];
-				const linkArr = link.href.split('/');
-				const unid = linkArr[linkArr.length -1];
-				link.setAttribute('href', '/minute/' + unid);
-			}
 			return body.innerHTML;
 
 			// const removeText = ['<html>','</html>','<body>','</body>','<head>','</head>'];
