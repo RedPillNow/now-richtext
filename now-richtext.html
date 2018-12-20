@@ -174,6 +174,95 @@ class NowRichtext extends Polymer.Element {
 		}
 		return null;
 	}
+	/**
+	 * Get the text nodes that display something like
+	 * "(See attached file: someFileName.pdf)". This allows
+	 * you to wrap that node in a link to the attachment
+	 * @returns {any[]}
+	 */
+	getAttachmentNodes() {
+		let attachmentNodes = [];
+		if (this.richTextObj && this.richTextObj.content) {
+			const mimeObjContent = this.richTextObj.content;
+			for (let i = 0; i < mimeObjContent.length; i++) {
+				const mimeObj = mimeObjContent[i];
+				if (mimeObj.contentDisposition && mimeObj.contentDisposition.startsWith('attachment;')) {
+					const dispArr = mimeObj.contentDisposition.split(';');
+					const fileNameArr = dispArr[1].split('=');
+					let fileName = fileNameArr[1];
+					fileName = fileName.replace(/"/g, '');
+					const attNode = this._getAttachmentNode(fileName);
+					if (attNode) {
+						attachmentNodes.push({
+							fileName: fileName,
+							node: attNode,
+							type: mimeObj.contentType
+						});
+					}
+				}
+			}
+		}
+		return attachmentNodes;
+	}
+	/**
+	 * Finds the attachment text which matches
+	 * the fileName
+	 * @param fileName {string}
+	 * @returns {Element}
+	 */
+	_getAttachmentNode(fileName) {
+		let textNode = null;
+		if (fileName) {
+			const markedHtml = this.$.markdownHtml;
+			const iNodes = markedHtml.querySelectorAll('i');
+			if (iNodes && iNodes.length > 0) {
+				for (let i = 0; i < iNodes.length; i++) {
+					const iNode = iNodes[i];
+					const iNodeKids = iNode.childNodes;
+					for (let j = 0; j < iNodeKids.length; j++) {
+						const kid = iNodeKids[j];
+						if (kid.nodeType === Node.TEXT_NODE) {
+							const iNodeText = kid.textContent;
+							if (iNodeText.indexOf('(See attached file:') > -1 && iNodeText.indexOf(fileName) > -1) {
+								textNode = iNode;
+							}
+						}
+					}
+				}
+			}
+		}
+		return textNode;
+	}
+	/**
+	 * Gets the HTML being displayed in the markdownHtml element
+	 * @returns {string}
+	 */
+	getRichtextInnerHTML() {
+		return this.$.markdownHtml.innerHTML;
+	}
+	/**
+	 * Get the "Notes" links contained in the rich text
+	 * @returns {any[]}
+	 */
+	getNotesLinks() {
+		const markedHtml = this.$.markdownHtml;
+		const links = [];
+		const notesLinks = markedHtml.querySelectorAll('a[href^="Notes://"]');
+		if (notesLinks && notesLinks.length > 0) {
+			for (let i = 0; i < notesLinks.length; i++) {
+				const notesLink = notesLinks[i];
+				const trimHref = notesLink.href.replace(/Notes:\/\//, '');
+				const notesLinkArr = trimHref.split('/');
+				links.push({
+					linkElem: notesLink,
+					hostname: notesLinkArr[0],
+					replicaId: notesLinkArr[1],
+					unid: notesLinkArr[notesLinkArr.length - 1]
+				});
+			}
+		}
+		return links;
+	}
 }
 customElements.define(NowRichtext.is, NowRichtext);
 	</script>
