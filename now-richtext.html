@@ -251,7 +251,7 @@ class NowRichtext extends Polymer.Element {
 		if (notesLinks && notesLinks.length > 0) {
 			for (let i = 0; i < notesLinks.length; i++) {
 				const notesLink = notesLinks[i];
-				const trimHref = notesLink.href.replace(/Notes:\/\//, '');
+				let trimHref = notesLink.href.replace(/Notes:\/\//, '');
 				trimHref = notesLink.href.replace(/notes:\/\//, '');
 				const notesLinkArr = trimHref.split('/');
 				links.push({
